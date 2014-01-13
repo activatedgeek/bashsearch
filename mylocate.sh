@@ -1,7 +1,5 @@
 #!/bin/bash
-
 DIR="$(pwd)"
-
 function handleParam {
 	filesrch="$1"
 	param="$2"
@@ -11,8 +9,20 @@ function handleParam {
 		echo "$filesrch" | egrep -i $'\t'"d"$'\t'
 	fi
 	if [[ "$param" = "-date" ]]; then
-		echo "checking date..." 2>&1
-		#do
+		#echo "checking date "  2>&1
+		given="$(echo "$value" | awk -F':' '{print $3"-"$2"-"$1" "$4":"$5":00"}')"
+		t1=$(date --date="$given" +%s)
+		#echo "bak ""$t1"
+		while IFS=$'\n' read -r line
+	    do
+	    	cur="$(echo "$line" | awk -F'\t' '{print $3}')"
+	    	t2=$(date --date="$cur" +%s)
+	    	#echo "cur ""$t2"
+	    	let "diff=$t2-$t1"
+	    	if (( $diff >= 0 )); then
+	    		echo "$line"
+	    	fi
+	    done <<< "$filesrch"
 	fi
 	if [[ "$param" = "-size" ]]; then
 		#echo "checking size"  2>&1
@@ -29,7 +39,6 @@ function handleParam {
 		echo "$filesrch" | grep "t$"
 	fi
 }
-
 if [[ ! -f "$DIR""/""index.txt" ]]; then
 	echo "\"index.txt\" not found. Generating Index..."
 	if [[ ! -f "scan.sh" ]]; then
@@ -38,14 +47,11 @@ if [[ ! -f "$DIR""/""index.txt" ]]; then
 	fi
 	./scan.sh
 fi
-
 if [[ "$1" = "" ]]; then
 	echo "No file to search."
 	exit
 fi
-
 result=""
-
 count=1
 for i in "$@"; 
 do
@@ -66,7 +72,6 @@ do
 	fi
 	let "count+=1"
 done
-
 if [[ ! -n "$result" ]]; then
 	echo "No files found with given parameters.."
 	exit
