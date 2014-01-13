@@ -3,7 +3,7 @@ bashsearch
 
 Bash Script to index files in folder and search
 
-#Do a "chmod +x scan.sh" for execution
+Do a "chmod +x scan.sh mylocate.sh" for execution (both in same dir)
 
 scan.sh
 =======
