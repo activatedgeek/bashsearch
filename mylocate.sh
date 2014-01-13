@@ -7,30 +7,35 @@ function handleParam {
 	param="$2"
 	value="$3"
 	if [[ "$param" = "-dir" ]]; then
+		#echo "checking only directories"  2>&1
 		echo "$filesrch" | egrep -i $'\t'"d"$'\t'
 	fi
 	if [[ "$param" = "-date" ]]; then
-		echo "checking date" 2>&1
+		echo "checking date..." 2>&1
 		#do
 	fi
 	if [[ "$param" = "-size" ]]; then
-		sizes="$(echo "$filesrch" | grep -o $'\t'"[0-9]*"$'\t')"
-		while IFS=$'\n' read -r line file
-		do
-			if ((${line:1: -1} >= $value)); then
-				echo "$line"
-			fi
-		done <<< "$sizes"
-		echo "checking size"  2>&1
-		#do
+		#echo "checking size"  2>&1
+		while IFS=$'\n' read -r line
+	    do
+	    	res="$(echo "$line" | grep -o $'\t'"[0-9]*"$'\t')"
+	    	if (( ${res:1: -1} >= $value )) ; then
+	    		echo "$line"
+	    	fi
+	    done <<< "$filesrch"
 	fi
 	if [[ "$param" = "-t" ]]; then
+		#echo "checking only text files"  2>&1
 		echo "$filesrch" | grep "t$"
 	fi
 }
 
 if [[ ! -f "$DIR""/""index.txt" ]]; then
 	echo "\"index.txt\" not found. Generating Index..."
+	if [[ ! -f "scan.sh" ]]; then
+		echo "Scan file not found. Exitting.."
+		exit
+	fi
 	./scan.sh
 fi
 
@@ -62,4 +67,8 @@ do
 	let "count+=1"
 done
 
+if [[ ! -n "$result" ]]; then
+	echo "No files found with given parameters.."
+	exit
+fi
 echo "$result"
