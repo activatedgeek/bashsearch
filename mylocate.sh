@@ -39,19 +39,32 @@ function handleParam {
 		echo "$filesrch" | grep "t$"
 	fi
 }
+
+function firstPass {
+	res="$(cat index.txt)"
+	while IFS=$'\n' read -r line
+	do 
+		filename=$(echo "$line" | awk -F'\t' '{print $2}')
+		if [[ $filename = $@ ]]; then
+			echo "$line"
+		fi
+	done <<< "$res"
+}
+
 if [[ ! -f "$DIR""/""index.txt" ]]; then
 	echo "\"index.txt\" not found. Generating Index..."
 	if [[ ! -f "scan.sh" ]]; then
 		echo "Scan file not found. Exitting.."
 		exit
 	fi
-	./scan.sh
+	scan
 fi
 if [[ "$1" = "" ]]; then
 	echo "No file to search."
 	exit
 fi
 result=""
+
 count=1
 for i in "$@"; 
 do
@@ -59,7 +72,7 @@ do
 		break
 	fi
 	if [[ "$count" -eq "1" ]]; then
-		result="$(cat index.txt | grep $'\t'"$1"$'\t')"
+		result="$(firstPass "$1")"
 	else
 		res="${@:$((count)):1}"
 		if [[ "$res" = "-size" || "$res" = "-date" ]]; then
@@ -72,6 +85,7 @@ do
 	fi
 	let "count+=1"
 done
+
 if [[ ! -n "$result" ]]; then
 	echo "No files found with given parameters.."
 	exit
