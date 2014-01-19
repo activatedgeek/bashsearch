@@ -53,8 +53,8 @@ function firstPass {
 
 if [[ ! -f "$DIR""/""index.txt" ]]; then
 	echo "\"index.txt\" not found. Generating Index..."
-	if [[ ! -f "scan.sh" ]]; then
-		echo "Scan file not found. Exitting.."
+	if [[ ! -f "$HOME/bin/scan" ]]; then
+		echo "Scan file not found. Exiting.."
 		exit
 	fi
 	scan
@@ -90,4 +90,9 @@ if [[ ! -n "$result" ]]; then
 	echo "No files found with given parameters.."
 	exit
 fi
-echo "$result"
+
+while IFS=$'\n' read -r line
+do 
+	filename=$(echo "$line" | awk -F'\t' '{print $1"/"$2}')
+	echo "$filename"
+done <<< "$result"
