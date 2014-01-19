@@ -59,7 +59,7 @@ do
 		break
 	fi
 	if [[ "$count" -eq "1" ]]; then
-		result="$(cat index.txt | grep $'\t'"$1")"
+		result="$(cat index.txt | grep $'\t'"$1"$'\t')"
 	else
 		res="${@:$((count)):1}"
 		if [[ "$res" = "-size" || "$res" = "-date" ]]; then
