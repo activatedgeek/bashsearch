@@ -45,7 +45,7 @@ function firstPass {
 	while IFS=$'\n' read -r line
 	do 
 		filename=$(echo "$line" | awk -F'\t' '{print $2}')
-		if [[ $filename = $@ ]]; then
+		if [[ $filename == $1 ]]; then
 			echo "$line"
 		fi
 	done <<< "$res"
